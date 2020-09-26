@@ -2,13 +2,6 @@ import React, { useState, useCallback } from 'react'
 
 import './Board.css'
 
-import whitePawn from './img/white-pawn.svg'
-import whiteKnight from './img/white-knight.svg'
-import whiteRook from './img/white-rook.svg'
-import whiteBishop from './img/white-bishop.svg'
-import whiteQueen from './img/white-queen.svg'
-import whiteKing from './img/white-king.svg'
-
 import blackPawn from './img/black-pawn.svg'
 import blackKnight from './img/black-knight.svg'
 import blackRook from './img/black-rook.svg'
@@ -16,41 +9,92 @@ import blackBishop from './img/black-bishop.svg'
 import blackQueen from './img/black-queen.svg'
 import blackKing from './img/black-king.svg'
 
+import whitePawn from './img/white-pawn.svg'
+import whiteKnight from './img/white-knight.svg'
+import whiteRook from './img/white-rook.svg'
+import whiteBishop from './img/white-bishop.svg'
+import whiteQueen from './img/white-queen.svg'
+import whiteKing from './img/white-king.svg'
+
+enum Token {
+  NONE,
+  BLACK_PAWN,
+  BLACK_KNIGHT,
+  BLACK_ROOK,
+  BLACK_BISHOP,
+  BLACK_QUEEN,
+  BLACK_KING,
+  WHITE_PAWN,
+  WHITE_KNIGHT,
+  WHITE_ROOK,
+  WHITE_BISHOP,
+  WHITE_QUEEN,
+  WHITE_KING,
+}
+
 const toBackgroundId = (index: number) => {
   return Math.floor(index / 8) % 2 === 0
     ? index % 2 === 0 ? 'white' : 'black'
     : index % 2 !== 0 ? 'white' : 'black'
 }
 
-const idToToken = (id: number) => {
-  switch (id) {
-    case 1: return <img src={whitePawn} alt='wp' />
-    case 2: return <img src={whiteKnight} alt='wkn' />
-    case 3: return <img src={whiteRook} alt='wr' />
-    case 4: return <img src={whiteBishop} alt='wb' />
-    case 5: return <img src={whiteQueen} alt='wq' />
-    case 6: return <img src={whiteKing} alt='wk' />
-
-    case 7:  return <img src={blackPawn} alt='bk' />
-    case 8:  return <img src={blackKnight} alt='bkn' />
-    case 9:  return <img src={blackRook} alt='br' />
-    case 10: return <img src={blackBishop} alt='bb' />
-    case 11: return <img src={blackQueen} alt='bq' />
-    case 12: return <img src={blackKing} alt='bk' />
+const renderToken = (token: Token) => {
+  switch (token) {
+    default:
+    case Token.NONE: return <></>
+    case Token.BLACK_PAWN:  return <img src={blackPawn} alt='bk' />
+    case Token.BLACK_KNIGHT:  return <img src={blackKnight} alt='bn' />
+    case Token.BLACK_ROOK:  return <img src={blackRook} alt='br' />
+    case Token.BLACK_BISHOP: return <img src={blackBishop} alt='bb' />
+    case Token.BLACK_QUEEN: return <img src={blackQueen} alt='bq' />
+    case Token.BLACK_KING: return <img src={blackKing} alt='bk' />
+    case Token.WHITE_PAWN:  return <img src={whitePawn} alt='wk' />
+    case Token.WHITE_KNIGHT:  return <img src={whiteKnight} alt='wn' />
+    case Token.WHITE_ROOK:  return <img src={whiteRook} alt='wr' />
+    case Token.WHITE_BISHOP: return <img src={whiteBishop} alt='wb' />
+    case Token.WHITE_QUEEN: return <img src={whiteQueen} alt='wq' />
+    case Token.WHITE_KING: return <img src={whiteKing} alt='wk' />
   }
-  return <></>
 }
 
 const Board = () => {
   const [board, setBoard] = useState([
-    9,  8, 10, 11, 12, 10,  8,  9,
-    7,  7,  7,  7,  7,  7,  7,  7,
-    0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,
-    1,  1,  1,  1,  1,  1,  1,  1,
-    3,  2,  4,  5,  6,  4,  2,  3,
+    Token.BLACK_ROOK,
+    Token.BLACK_KNIGHT,
+    Token.BLACK_BISHOP,
+    Token.BLACK_QUEEN,
+    Token.BLACK_KING,
+    Token.BLACK_BISHOP,
+    Token.BLACK_KNIGHT,
+    Token.BLACK_ROOK,
+    Token.BLACK_PAWN,
+    Token.BLACK_PAWN,
+    Token.BLACK_PAWN,
+    Token.BLACK_PAWN,
+    Token.BLACK_PAWN,
+    Token.BLACK_PAWN,
+    Token.BLACK_PAWN,
+    Token.BLACK_PAWN,
+    Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE,
+    Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE,
+    Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE,
+    Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE,
+    Token.WHITE_PAWN,
+    Token.WHITE_PAWN,
+    Token.WHITE_PAWN,
+    Token.WHITE_PAWN,
+    Token.WHITE_PAWN,
+    Token.WHITE_PAWN,
+    Token.WHITE_PAWN,
+    Token.WHITE_PAWN,
+    Token.WHITE_ROOK,
+    Token.WHITE_KNIGHT,
+    Token.WHITE_BISHOP,
+    Token.WHITE_QUEEN,
+    Token.WHITE_KING,
+    Token.WHITE_BISHOP,
+    Token.WHITE_KNIGHT,
+    Token.WHITE_ROOK,
   ])
   const [selected, setSelected] = useState<number>()
   const [attack, setAttack] = useState<number>()
@@ -75,7 +119,7 @@ const Board = () => {
     setSelected(index)
   }
 
-  const cell = useCallback((_: number, index: number) =>
+  const render = useCallback((token: Token, index: number) =>
     <div
       className='CellBackground'
       key={index}
@@ -86,16 +130,14 @@ const Board = () => {
         className='Cell'
         id={index === selected ? 'selected' : highlighted.findIndex(i => i === index) >= 0 ? 'highlighted' : ''}
       >
-        {idToToken(board[index])}
+        {renderToken(token)}
       </div>
     </div>, [selected, highlighted])
 
   return (
     <>
       <div className='Board'>
-        {Array.from(Array(64))
-          .map(cell)
-        }
+        {board.map(render)}
       </div>
       <div>1</div>
       <div>2</div>

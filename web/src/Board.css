@@ -33,27 +33,24 @@
   flex-direction: column;
 
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 
+  padding-bottom: 10%;
   box-sizing: border-box;
 }
 
 .Cell img {
   max-width: 33%;
-
-  cursor: pointer;
+  filter: drop-shadow(0 0.4vmin 0.2vmin #555555);
 }
 
 .Cell#selected {
   background: radial-gradient(farthest-corner at 25% 25%, #8080dd, #5050aa);
-  border-style: solid;
-  border-color: #5050aa;
+  box-shadow: inset 0.2vmin 0.2vmin 0.4vmin #444444;
 }
 
 .Cell#attack {
   background-color: #dd808040;
-  border-style: solid;
-  border-color: #aa5050;
 }
 
 .Cell#highlighted {
