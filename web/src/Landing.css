@@ -1,0 +1,11 @@
+.Landing {
+  text-align: center;
+}
+
+.Landing-Logo {
+  font-size: 2rem;
+}
+
+.Landing-Logo img {
+  height: 2rem;
+}

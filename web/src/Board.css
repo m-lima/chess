@@ -1,0 +1,61 @@
+.Board {
+  margin: auto;
+  display: grid;
+
+  grid-gap: 0;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+
+  width: 90vmin;
+  height: 90vmin;
+}
+
+.CellBackground {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.CellBackground#white {
+  color: black;
+  background: radial-gradient(farthest-corner at 25% 25%, #ffffff, #cccccc);
+}
+
+.CellBackground#black {
+  color: white;
+  background: radial-gradient(farthest-corner at 25% 25%, #444444, #222222);
+}
+
+.Cell {
+  min-width: 100%;
+  min-height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+}
+
+.Cell img {
+  max-width: 33%;
+
+  cursor: pointer;
+}
+
+.Cell#selected {
+  background: radial-gradient(farthest-corner at 25% 25%, #8080dd, #5050aa);
+  border-style: solid;
+  border-color: #5050aa;
+}
+
+.Cell#attack {
+  background-color: #dd808040;
+  border-style: solid;
+  border-color: #aa5050;
+}
+
+.Cell#highlighted {
+  background-color: #00800080;
+}
