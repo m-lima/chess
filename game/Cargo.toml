@@ -1,5 +1,5 @@
 [package]
-name = "server"
+name = "game"
 version = "0.1.0"
 authors = ["m-lima <marcelowind@gmail.com>"]
 edition = "2018"
@@ -8,4 +8,5 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+js-sys = "0.3"
 wasm-bindgen = "0.2"

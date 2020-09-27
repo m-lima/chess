@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from 'react'
 
+import * as game from 'game'
+
 import './Board.css'
 
 import blackPawn from './img/black-pawn.svg'
@@ -16,21 +18,21 @@ import whiteBishop from './img/white-bishop.svg'
 import whiteQueen from './img/white-queen.svg'
 import whiteKing from './img/white-king.svg'
 
-enum Token {
-  NONE,
-  BLACK_PAWN,
-  BLACK_KNIGHT,
-  BLACK_ROOK,
-  BLACK_BISHOP,
-  BLACK_QUEEN,
-  BLACK_KING,
-  WHITE_PAWN,
-  WHITE_KNIGHT,
-  WHITE_ROOK,
-  WHITE_BISHOP,
-  WHITE_QUEEN,
-  WHITE_KING,
-}
+/* enum Token { */
+/*   NONE, */
+/*   BLACK_PAWN, */
+/*   BLACK_KNIGHT, */
+/*   BLACK_ROOK, */
+/*   BLACK_BISHOP, */
+/*   BLACK_QUEEN, */
+/*   BLACK_KING, */
+/*   WHITE_PAWN, */
+/*   WHITE_KNIGHT, */
+/*   WHITE_ROOK, */
+/*   WHITE_BISHOP, */
+/*   WHITE_QUEEN, */
+/*   WHITE_KING, */
+/* } */
 
 const toBackgroundId = (index: number) => {
   return Math.floor(index / 8) % 2 === 0
@@ -38,8 +40,8 @@ const toBackgroundId = (index: number) => {
     : index % 2 !== 0 ? 'white' : 'black'
 }
 
-const renderToken = (token: Token) => {
-  switch (token) {
+const renderToken = (cell: game.Cell) => {
+  switch () {
     default:
     case Token.NONE: return <></>
     case Token.BLACK_PAWN:  return <img src={blackPawn} alt='bk' />
@@ -58,50 +60,15 @@ const renderToken = (token: Token) => {
 }
 
 const Board = () => {
-  const [board, setBoard] = useState([
-    Token.BLACK_ROOK,
-    Token.BLACK_KNIGHT,
-    Token.BLACK_BISHOP,
-    Token.BLACK_QUEEN,
-    Token.BLACK_KING,
-    Token.BLACK_BISHOP,
-    Token.BLACK_KNIGHT,
-    Token.BLACK_ROOK,
-    Token.BLACK_PAWN,
-    Token.BLACK_PAWN,
-    Token.BLACK_PAWN,
-    Token.BLACK_PAWN,
-    Token.BLACK_PAWN,
-    Token.BLACK_PAWN,
-    Token.BLACK_PAWN,
-    Token.BLACK_PAWN,
-    Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE,
-    Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE,
-    Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE,
-    Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE, Token.NONE,
-    Token.WHITE_PAWN,
-    Token.WHITE_PAWN,
-    Token.WHITE_PAWN,
-    Token.WHITE_PAWN,
-    Token.WHITE_PAWN,
-    Token.WHITE_PAWN,
-    Token.WHITE_PAWN,
-    Token.WHITE_PAWN,
-    Token.WHITE_ROOK,
-    Token.WHITE_KNIGHT,
-    Token.WHITE_BISHOP,
-    Token.WHITE_QUEEN,
-    Token.WHITE_KING,
-    Token.WHITE_BISHOP,
-    Token.WHITE_KNIGHT,
-    Token.WHITE_ROOK,
-  ])
+  const [board, setBoard] = useState(new game.Board())
   const [selected, setSelected] = useState<number>()
   const [attack, setAttack] = useState<number>()
   const [highlighted, setHighlighted] = useState<number[]>([])
 
   const select = (index: number) => {
     const highlightList = []
+
+    game.possible_moves_js(index, board)
 
     let cell = index - 8
     while (cell >= 0) {
