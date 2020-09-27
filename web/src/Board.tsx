@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 import * as game from 'game'
 
@@ -18,75 +18,59 @@ import whiteBishop from './img/white-bishop.svg'
 import whiteQueen from './img/white-queen.svg'
 import whiteKing from './img/white-king.svg'
 
-/* enum Token { */
-/*   NONE, */
-/*   BLACK_PAWN, */
-/*   BLACK_KNIGHT, */
-/*   BLACK_ROOK, */
-/*   BLACK_BISHOP, */
-/*   BLACK_QUEEN, */
-/*   BLACK_KING, */
-/*   WHITE_PAWN, */
-/*   WHITE_KNIGHT, */
-/*   WHITE_ROOK, */
-/*   WHITE_BISHOP, */
-/*   WHITE_QUEEN, */
-/*   WHITE_KING, */
-/* } */
-
 const toBackgroundId = (index: number) => {
   return Math.floor(index / 8) % 2 === 0
     ? index % 2 === 0 ? 'white' : 'black'
     : index % 2 !== 0 ? 'white' : 'black'
 }
 
-const renderToken = (cell: game.Cell) => {
-  switch () {
-    default:
-    case Token.NONE: return <></>
-    case Token.BLACK_PAWN:  return <img src={blackPawn} alt='bk' />
-    case Token.BLACK_KNIGHT:  return <img src={blackKnight} alt='bn' />
-    case Token.BLACK_ROOK:  return <img src={blackRook} alt='br' />
-    case Token.BLACK_BISHOP: return <img src={blackBishop} alt='bb' />
-    case Token.BLACK_QUEEN: return <img src={blackQueen} alt='bq' />
-    case Token.BLACK_KING: return <img src={blackKing} alt='bk' />
-    case Token.WHITE_PAWN:  return <img src={whitePawn} alt='wk' />
-    case Token.WHITE_KNIGHT:  return <img src={whiteKnight} alt='wn' />
-    case Token.WHITE_ROOK:  return <img src={whiteRook} alt='wr' />
-    case Token.WHITE_BISHOP: return <img src={whiteBishop} alt='wb' />
-    case Token.WHITE_QUEEN: return <img src={whiteQueen} alt='wq' />
-    case Token.WHITE_KING: return <img src={whiteKing} alt='wk' />
+const renderToken = (fen_char: number) => {
+  switch (fen_char) {
+    default: return <></>
+    case 112: return <img src={blackPawn} alt='p' />
+    case 110: return <img src={blackKnight} alt='n' />
+    case 114: return <img src={blackRook} alt='r' />
+    case  98: return <img src={blackBishop} alt='b' />
+    case 113: return <img src={blackQueen} alt='q' />
+    case 107: return <img src={blackKing} alt='k' />
+    case  80: return <img src={whitePawn} alt='P' />
+    case  78: return <img src={whiteKnight} alt='N' />
+    case  82: return <img src={whiteRook} alt='R' />
+    case  66: return <img src={whiteBishop} alt='B' />
+    case  81: return <img src={whiteQueen} alt='Q' />
+    case  75: return <img src={whiteKing} alt='K' />
   }
 }
 
 const Board = () => {
-  const [board, setBoard] = useState(new game.Board())
+  const color = game.Color.White;
+  const [bla, setBla] = useState(new game.Board())
+  const [board, setBoard] = useState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+  const [codes, setCodes] = useState<number[]>([])
   const [selected, setSelected] = useState<number>()
   const [attack, setAttack] = useState<number>()
   const [highlighted, setHighlighted] = useState<number[]>([])
 
+  useEffect(() => {
+    const clean = board.substring(0, board.indexOf(' '))
+    setCodes([...clean].flatMap(c => {
+      const code = c.charCodeAt(0)
+      if (code === 47) {
+        return []
+      } else if (code > 48 && code < 57) {
+        return Array.from(Array(code - 48))
+      } else {
+        return [code]
+      }
+    }))
+  }, [board])
+
   const select = (index: number) => {
-    const highlightList = []
-
-    game.possible_moves_js(index, board)
-
-    let cell = index - 8
-    while (cell >= 0) {
-      highlightList.push(cell)
-      cell -= 8
-    }
-
-    cell = index + 8
-    while (cell < 64) {
-      highlightList.push(cell)
-      cell += 8
-    }
-
-    setHighlighted(highlightList)
+    setHighlighted(bla.legal_moves(index))
     setSelected(index)
   }
 
-  const render = useCallback((token: Token, index: number) =>
+  const render = (code: number, index: number) =>
     <div
       className='CellBackground'
       key={index}
@@ -95,16 +79,21 @@ const Board = () => {
     >
       <div
         className='Cell'
+        onClick{() => {
+          if (highlighted.indexOf(index) < 0) return
+
+          bla.move(selected, index)
+        }}
         id={index === selected ? 'selected' : highlighted.findIndex(i => i === index) >= 0 ? 'highlighted' : ''}
       >
-        {renderToken(token)}
+        {renderToken(code)}
       </div>
-    </div>, [selected, highlighted])
+    </div>
 
   return (
     <>
       <div className='Board'>
-        {board.map(render)}
+        {codes.map(render)}
       </div>
       <div>1</div>
       <div>2</div>

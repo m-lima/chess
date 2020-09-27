@@ -5,3 +5,9 @@ authors = ["m-lima <marcelowind@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+chess = "3.1.1"
+gotham = "0.5"
+gotham_derive = "0.5"
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+simplelog = "0.8"
