@@ -3,6 +3,7 @@
 
 mod handler;
 mod middleware;
+mod websocket;
 
 fn routes() -> gotham::router::Router {
     use gotham::pipeline;

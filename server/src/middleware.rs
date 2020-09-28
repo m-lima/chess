@@ -91,21 +91,21 @@ impl gotham::middleware::Middleware for Log {
 
 #[derive(Clone, gotham_derive::StateData, gotham_derive::NewMiddleware)]
 pub struct Game {
-    games: std::sync::Arc<std::sync::Mutex<std::collections::HashMap<String, String>>>,
+    games: std::sync::Arc<std::sync::Mutex<std::collections::HashMap<u32, String>>>,
 }
 
 impl Game {
     pub fn new() -> Self {
         let mut map = std::collections::HashMap::new();
-        map.insert(String::from("123"), String::from("a game is running"));
+        map.insert(123, String::from("a game is running"));
         Self {
             games: std::sync::Arc::new(std::sync::Mutex::new(map)),
         }
     }
 
-    pub fn get(&self, id: &str) -> Option<String> {
+    pub fn get(&self, id: u32) -> Option<String> {
         let games = self.games.lock().unwrap();
-        games.get(id).map(std::clone::Clone::clone)
+        games.get(&id).map(std::clone::Clone::clone)
     }
 }
 
