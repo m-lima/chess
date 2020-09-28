@@ -1,5 +1,0 @@
-[package]
-name = "game"
-version = "0.1.0"
-authors = ["m-lima <marcelowind@gmail.com>"]
-edition = "2018"
