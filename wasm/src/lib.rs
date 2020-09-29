@@ -18,14 +18,28 @@ fn translate_index(index: u8) -> u8 {
 #[wasm_bindgen]
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum State {
-    None,
-    WhiteCheckmates,
-    WhiteResigns,
-    BlackCheckmates,
-    BlackResigns,
+    Ongoing,
     Stalemate,
-    DrawAccepted,
-    DrawDeclared,
+    Checkmate,
+}
+
+#[wasm_bindgen]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[repr(u8)]
+pub enum Piece {
+    None,
+    BlackPawn,
+    BlackKnight,
+    BlackRook,
+    BlackBishop,
+    BlackQueen,
+    BlackKing,
+    WhitePawn,
+    WhiteKnight,
+    WhiteRook,
+    WhiteBishop,
+    WhiteQueen,
+    WhiteKing,
 }
 
 #[wasm_bindgen]
@@ -37,24 +51,53 @@ pub enum Color {
 
 #[wasm_bindgen]
 pub struct Board {
-    game: chess::Game,
+    board: chess::Board,
     moves: Vec<chess::ChessMove>,
 }
 
 #[wasm_bindgen]
 impl Board {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Self {
-        let game = chess::Game::new();
+    pub fn new(fen: &str) -> Self {
+        use std::str::FromStr;
+        let board = chess::Board::from_str(fen).expect("valid fen");
         Self {
-            moves: chess::MoveGen::new_legal(&game.current_position()).collect(),
-            game,
+            moves: chess::MoveGen::new_legal(&board).collect(),
+            board,
         }
     }
 
     #[wasm_bindgen]
     pub fn to_fen(&self) -> js_sys::JsString {
-        self.game.current_position().to_string().into()
+        self.board.to_string().into()
+    }
+
+    #[wasm_bindgen]
+    pub fn enumerate(&self) -> js_sys::Array {
+        self.board
+            .to_string()
+            .chars()
+            .take_while(|c| c != &' ')
+            .filter_map(|c| match c {
+                'p' => Some(vec![Piece::BlackPawn]),
+                'n' => Some(vec![Piece::BlackKnight]),
+                'r' => Some(vec![Piece::BlackRook]),
+                'b' => Some(vec![Piece::BlackBishop]),
+                'q' => Some(vec![Piece::BlackQueen]),
+                'k' => Some(vec![Piece::BlackKing]),
+                'P' => Some(vec![Piece::WhitePawn]),
+                'N' => Some(vec![Piece::WhiteKnight]),
+                'R' => Some(vec![Piece::WhiteRook]),
+                'B' => Some(vec![Piece::WhiteBishop]),
+                'Q' => Some(vec![Piece::WhiteQueen]),
+                'K' => Some(vec![Piece::WhiteKing]),
+                empty @ '1'..='8' => Some(vec![Piece::None; empty as usize - '0' as usize]),
+                _ => None,
+            })
+            .flat_map(|c| c)
+            .map(|c| c as u8)
+            .map(JsValue::from)
+            .collect()
     }
 
     #[wasm_bindgen]
@@ -73,7 +116,7 @@ impl Board {
 
     #[wasm_bindgen]
     pub fn side_to_move(&self) -> Color {
-        match self.game.side_to_move() {
+        match self.board.side_to_move() {
             chess::Color::Black => Color::Black,
             chess::Color::White => Color::White,
         }
@@ -81,15 +124,10 @@ impl Board {
 
     #[wasm_bindgen]
     pub fn result(&self) -> State {
-        match self.game.result() {
-            None => State::None,
-            Some(chess::GameResult::Stalemate) => State::Stalemate,
-            Some(chess::GameResult::DrawDeclared) => State::DrawDeclared,
-            Some(chess::GameResult::DrawAccepted) => State::DrawAccepted,
-            Some(chess::GameResult::BlackResigns) => State::BlackResigns,
-            Some(chess::GameResult::BlackCheckmates) => State::BlackCheckmates,
-            Some(chess::GameResult::WhiteResigns) => State::WhiteResigns,
-            Some(chess::GameResult::WhiteCheckmates) => State::WhiteCheckmates,
+        match self.board.status() {
+            chess::BoardStatus::Ongoing => State::Ongoing,
+            chess::BoardStatus::Stalemate => State::Stalemate,
+            chess::BoardStatus::Checkmate => State::Checkmate,
         }
     }
 }
