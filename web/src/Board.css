@@ -50,9 +50,21 @@
 }
 
 .Cell#attack {
-  background-color: #dd808040;
+  background-color: #80000080;
 }
 
 .Cell#highlighted {
   background-color: #00800080;
+}
+
+.Clickable {
+  cursor: pointer;
+}
+
+.Clickable:hover {
+  filter: brightness(1.2);
+}
+
+.Clickable:active {
+  filter: brightness(1.5);
 }

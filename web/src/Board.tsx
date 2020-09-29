@@ -18,13 +18,30 @@ import whiteBishop from './img/white-bishop.svg'
 import whiteQueen from './img/white-queen.svg'
 import whiteKing from './img/white-king.svg'
 
+enum Accent {
+  REGULAR,
+  SELECTED,
+  HIGHLIGHTED,
+  ATTACK,
+}
+
+const toAccentId = (accent: Accent) => {
+  switch (accent) {
+    default:
+    case Accent.REGULAR: return ''
+    case Accent.SELECTED: return 'selected'
+    case Accent.HIGHLIGHTED: return 'highlighted'
+    case Accent.ATTACK: return 'attack'
+  }
+}
+
 const toBackgroundId = (index: number) => {
   return Math.floor(index / 8) % 2 === 0
     ? index % 2 === 0 ? 'white' : 'black'
     : index % 2 !== 0 ? 'white' : 'black'
 }
 
-const renderToken = (piece: game.Piece) => {
+const renderPiece = (piece: game.Piece) => {
   switch (piece) {
     default: return <></>
     case game.Piece.BlackPawn: return <img src={blackPawn} alt='p' />
@@ -52,33 +69,47 @@ const Board = (props: IProps) => {
   const [selected, setSelected] = useState<number>()
   const [highlighted, setHighlighted] = useState<number[]>([])
 
-  useEffect(() => {
-    setBoard(props.board.enumerate())
-  }, [props.board])
+  useEffect(() => setBoard(props.board.enumerate()), [props.board])
 
   const select = useCallback((index: number) => {
-    if (!board) return
     setHighlighted(props.board.legal_moves(index))
     setSelected(index)
-  }, [board, props.board])
+  }, [props.board])
 
-  const render = (code: number, index: number) =>
-    <div
-      className='CellBackground'
-      key={index}
-      onClick={() => select(index)}
-      id={toBackgroundId(index)}
-    >
+  const accentuate = useCallback((index: number) =>
+    index === selected
+      ? Accent.SELECTED
+      : highlighted.indexOf(index) >= 0
+        ? board[index] === game.Piece.None
+          ? Accent.HIGHLIGHTED
+          : Accent.ATTACK
+        : Accent.REGULAR
+  , [board, selected, highlighted])
+
+  const isClickable = (piece: game.Piece, accent: Accent) =>
+    accent !== Accent.SELECTED
+      && (accent === Accent.HIGHLIGHTED
+          || accent === Accent.ATTACK
+          || game.color_for(piece) === props.color)
+
+  const render = (piece: game.Piece, index: number) => {
+    const accent = accentuate(index)
+    return (
       <div
-        className='Cell'
-        onClick={() => {
-          if (highlighted.indexOf(index) < 0) return
-        }}
-        id={index === selected ? 'selected' : highlighted.findIndex(i => i === index) >= 0 ? 'highlighted' : ''}
+        className='CellBackground'
+        key={index}
+        id={toBackgroundId(index)}
       >
-        {renderToken(code)}
+        <div
+          className={`Cell ${isClickable(piece, accent) && 'Clickable'}`}
+          onClick={() => game.color_for(piece) === props.color && select(index)}
+          id={toAccentId(accent)}
+        >
+          {renderPiece(piece)}
+        </div>
       </div>
-    </div>
+    )
+  }
 
   return (
     <>
