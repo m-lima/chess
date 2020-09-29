@@ -43,6 +43,25 @@ pub enum Piece {
 }
 
 #[wasm_bindgen]
+pub fn color_for(piece: Piece) -> Option<Color> {
+    match piece {
+        Piece::None => None,
+        Piece::BlackPawn
+        | Piece::BlackKnight
+        | Piece::BlackRook
+        | Piece::BlackBishop
+        | Piece::BlackQueen
+        | Piece::BlackKing => Some(Color::Black),
+        Piece::WhitePawn
+        | Piece::WhiteKnight
+        | Piece::WhiteRook
+        | Piece::WhiteBishop
+        | Piece::WhiteQueen
+        | Piece::WhiteKing => Some(Color::White),
+    }
+}
+
+#[wasm_bindgen]
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum Color {
     Black,
