@@ -5,6 +5,8 @@ import {
   Switch 
 } from 'react-router-dom'
 
+import * as game from 'game'
+
 import Board from './Board'
 import Landing from './Landing'
 
@@ -19,7 +21,12 @@ const App = () =>
       <Route
         path={'/game/:id'}
         exact
-        render={() => <Board />}
+        render={() =>
+          <Board
+            color={game.Color.White}
+            board={new game.Board('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')}
+          />
+        }
       />
     </Switch>
   </Router>

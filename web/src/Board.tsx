@@ -24,51 +24,43 @@ const toBackgroundId = (index: number) => {
     : index % 2 !== 0 ? 'white' : 'black'
 }
 
-const renderToken = (fen_char: number) => {
-  switch (fen_char) {
+const renderToken = (piece: game.Piece) => {
+  switch (piece) {
     default: return <></>
-    case 112: return <img src={blackPawn} alt='p' />
-    case 110: return <img src={blackKnight} alt='n' />
-    case 114: return <img src={blackRook} alt='r' />
-    case  98: return <img src={blackBishop} alt='b' />
-    case 113: return <img src={blackQueen} alt='q' />
-    case 107: return <img src={blackKing} alt='k' />
-    case  80: return <img src={whitePawn} alt='P' />
-    case  78: return <img src={whiteKnight} alt='N' />
-    case  82: return <img src={whiteRook} alt='R' />
-    case  66: return <img src={whiteBishop} alt='B' />
-    case  81: return <img src={whiteQueen} alt='Q' />
-    case  75: return <img src={whiteKing} alt='K' />
+    case game.Piece.BlackPawn: return <img src={blackPawn} alt='p' />
+    case game.Piece.BlackKnight: return <img src={blackKnight} alt='n' />
+    case game.Piece.BlackRook: return <img src={blackRook} alt='r' />
+    case game.Piece.BlackBishop: return <img src={blackBishop} alt='b' />
+    case game.Piece.BlackQueen: return <img src={blackQueen} alt='q' />
+    case game.Piece.BlackKing: return <img src={blackKing} alt='k' />
+    case game.Piece.WhitePawn: return <img src={whitePawn} alt='P' />
+    case game.Piece.WhiteKnight: return <img src={whiteKnight} alt='N' />
+    case game.Piece.WhiteRook: return <img src={whiteRook} alt='R' />
+    case game.Piece.WhiteBishop: return <img src={whiteBishop} alt='B' />
+    case game.Piece.WhiteQueen: return <img src={whiteQueen} alt='Q' />
+    case game.Piece.WhiteKing: return <img src={whiteKing} alt='K' />
   }
 }
 
-const Board = () => {
-  const color = game.Color.White;
-  const [bla, setBla] = useState(new game.Board())
-  const [board, setBoard] = useState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
-  const [codes, setCodes] = useState<number[]>([])
+interface IProps {
+  board: game.Board
+  color: game.Color
+}
+
+const Board = (props: IProps) => {
+  const [board, setBoard] = useState<game.Piece[]>([])
   const [selected, setSelected] = useState<number>()
-  const [attack, setAttack] = useState<number>()
   const [highlighted, setHighlighted] = useState<number[]>([])
 
   useEffect(() => {
-    const clean = board.substring(0, board.indexOf(' '))
-    setCodes([...clean].flatMap(c => {
-      const code = c.charCodeAt(0)
-      if (code === 47) {
-        return []
-      } else if (code > 48 && code < 57) {
-        return Array.from(Array(code - 48))
-      } else {
-        return [code]
-      }
-    }))
-  }, [board])
+    setBoard(props.board.enumerate())
+  }, [props.board])
 
-  const select = (index: number) => {
-    setHighlighted(bla.legal_moves(index))
+  const select = useCallback((index: number) => {
+    if (!board) return
+    setHighlighted(props.board.legal_moves(index))
     setSelected(index)
-  }
+  }, [board, props.board])
 
   const render = (code: number, index: number) =>
     <div
@@ -79,10 +71,8 @@ const Board = () => {
     >
       <div
         className='Cell'
-        onClick{() => {
+        onClick={() => {
           if (highlighted.indexOf(index) < 0) return
-
-          bla.move(selected, index)
         }}
         id={index === selected ? 'selected' : highlighted.findIndex(i => i === index) >= 0 ? 'highlighted' : ''}
       >
@@ -93,7 +83,7 @@ const Board = () => {
   return (
     <>
       <div className='Board'>
-        {codes.map(render)}
+        {board.map(render)}
       </div>
       <div>1</div>
       <div>2</div>
